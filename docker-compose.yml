@@ -1,29 +1,43 @@
-# Use postgres/example user/password credentials
 
 services:
 
-  db:
-    image: postgres:16-alpine
-    # restart: always
-    # set shared memory limit when using docker compose
-    # shm_size: 128mb
-    # or set shared memory limit when deploy via swarm stack
-    volumes:
-       - db_data:/var/lib/postgresql/data
-    #  - type: tmpfs
-    #    target: /dev/shm
-    #    tmpfs:
-    #      size: 134217728 # 128*2^20 bytes = 128Mb
-    environment:
-      POSTGRES_PASSWORD: example
-    ports:
-      - 5432:5432
+    db:
+      image: postgres:16-alpine
+      # restart: always
+      # set shared memory limit when using docker compose
+      # shm_size: 128mb
+      # or set shared memory limit when deploy via swarm stack
+      volumes:
+        - db_data:/var/lib/postgresql/data
+      #  - type: tmpfs
+      #    target: /dev/shm
+      #    tmpfs:
+      #      size: 134217728 # 128*2^20 bytes = 128Mb
+      environment:
+        POSTGRES_PASSWORD: example
+      ports:
+        - 5432:5432
+    minio:
+      image: quay.io/minio/minio:latest 
+      # restart: always
+      ports:
+        - 9001:9001
+        - 9000:9000
+      environment:
+        MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+        MINIO_ROOT_PASSWORD:  ${MINIO_ROOT_PASSWORD}
+      command: server /data --console-address ":9001" 
+
+      volumes:
+        - minio_data:/data   
+      
+      
 volumes:
     db_data:
-           
-
-  # adminer:
-  #   image: adminer
-  #   restart: always
-  #   ports:
-  #     - 8080:8080
+    minio_data:
+            
+    # adminer:
+    #   image: adminer
+    #   restart: always
+    #   ports:
+    #     - 8080:8080
